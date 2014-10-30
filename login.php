@@ -27,9 +27,6 @@ if($post['usuario'] != "" && $post['senha'] != ""){
 	
 		echo '<br>Usuário ou senha inválido(s)';
 	}
-	
-	
-
 }
 else{
 	
