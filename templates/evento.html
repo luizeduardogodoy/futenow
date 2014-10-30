@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<link rel="stylesheet" href="js/jqwidgets/styles/jqx.base.css" type="text/css" />
+<link rel="stylesheet" href="js/jqwidgets/styles/jqx.summer.css" type="text/css" />
+<script type="text/javascript" src="js/jquery/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxcore.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxbuttons.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxscrollbar.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxmenu.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxlistbox.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxdropdownlist.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxwindow.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxbuttons.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxcheckbox.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxscrollbar.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxpanel.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.js"></script>
+<!--<script type="text/javascript" src="js/jqwidgets/jqxgrid.storage.js"></script>-->
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.selection.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxcalendar.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxdatetimeinput.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.sort.js"></script>		
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.filter.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxdata.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.pager.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.columnsresize.js"></script>		
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.columnsreorder.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxinput.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxvalidator.js"></script> 
+<script type="text/javascript" src="js/jqwidgets/jqxcombobox.js"></script>   
+
+<script type="text/javascript" src="js/jqwidgets/jqxdatatable.js"></script>
+<script type="text/javascript" src="js/jqwidgets/globalization/globalize.js"></script>
+<script type="text/javascript" src="js/jqwidgets/globalization/cultures/globalize.culture.pt-BR.js"></script>
+<script type="text/javascript" src="js/localization.js"></script>
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<title>FuteNow</title>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		
+		var theme = 'summer';		
+		
+		$('a, button, input[type=submit]').jqxButton();
+		
+		var inicioDate = new Date();
+		inicioDate.setHours(inicioDate.getHours() + 1);
+		
+		var inicioDateMin = new Date();
+		inicioDateMin.setDate(inicioDateMin.getDate() - 1);
+		inicioDateMin.setHours(inicioDateMin.getHours() + 1);
+				
+		var inicioDateMax = new Date();
+		inicioDateMax.setDate(inicioDateMax.getDate() + 30);
+		
+		$('#inicio').jqxDateTimeInput({
+			min: inicioDateMin, 
+			max : inicioDateMax, 
+			width: '300px', 
+			height: '25px', 
+			culture: 'pt-BR',
+			theme: theme,
+			value: inicioDate,
+			formatString: "dd/M/yyyy HH:mm"
+		});	
+		
+		var inicioTimeDateMin =inicioDateMin;
+			
+		inicioTimeDateMin.setDate(inicioTimeDateMin.getDate() + 1);
+		
+		$('#inicio').on('valuechanged', function (event){  
+			var jsDate = event.args.date; 
+			
+			var dateAtual = new Date();
+			
+			$('#hora_limite_confirmacao').jqxDateTimeInput({max: jsDate});
+		
+		}); 
+		
+		var date1 = inicioDateMin;
+		
+		date1.setHours(date1.getHours() - 1);	
+		
+		$('#hora_limite_confirmacao').jqxDateTimeInput({ 
+			width: '300px',
+			height: '25px',
+			culture: 'pt-BR',
+			theme: theme,
+			min: date1,
+			
+			max: inicioDateMin,
+			value : date1,
+			formatString: "dd/M/yyyy HH:mm"
+		});
+
+		
+		// prepare the data
+		var sourceLocal =
+		{
+			 datatype: "json",
+			 datafields: [
+				  { name: 'bairro_id' },
+				  { name: 'nome' },
+				  { name: 'id' }
+			 ],
+			 url: "inc/ajax.php?req=local"
+			 
+		};
+		//var dataAdapterLocal = new $.jqx.dataAdapter(sourceLocal);
+		// Create a jqxComboBox
+		$("#local").jqxComboBox({
+			disabled: true,
+			promptText: "Selecione o local...",
+			theme: theme, 
+			selectedIndex: 0, 
+			displayMember: "nome", 
+			valueMember: "id", 
+			width: 200, 
+			height: 25
+		});	  
+	  
+		// prepare the data
+		var sourceBairro =
+		{
+			 datatype: "json",
+			 datafields: [
+				  { name: 'bairro_id' },
+				  { name: 'nome' }
+				  
+			 ],
+			 url: "inc/ajax.php?req=bairro"
+			 
+		};
+		var dataAdapterBairro = new $.jqx.dataAdapter(sourceBairro);
+		// Create a jqxComboBox
+		$("#bairro").jqxComboBox({
+			promptText: "Selecione o bairro...", 
+			theme: theme, 
+			source: dataAdapterBairro, 
+			displayMember: "nome", 
+			valueMember: "bairro_id", 
+			width: 200, 
+			height: 25});
+	  
+		$("#bairro").bind('select', function(event)
+		{
+			if (event.args)
+			{				
+				$("#local").jqxComboBox({ disabled: false, selectedIndex: 0});		
+				
+				var value = event.args.item.value;
+				
+				sourceLocal.data = {bairro_id: value};
+				
+				sourceLocal.url = "inc/ajax.php?req=local&bairro_id=" + value; 
+				
+				dataAdapterLocal = new $.jqx.dataAdapter(sourceLocal);
+				$("#local").jqxComboBox({source: dataAdapterLocal});
+			}
+		}); 
+	
+		
+		$("#sendButton").click(function () {
+			var validationResult = function (isValid) {
+				if (isValid) {
+					$("#form").submit();
+				}
+			}
+			$('#form').jqxValidator('validate', validationResult);
+		});
+
+		
+		 $('#form').jqxValidator({
+					 //hintType: 'label',
+                rules: [
+                       { input: '#observacoes', message: 'Informe a observação', action: 'keyup, blur', rule: 'required' },
+							  { input: '#bairro input', message: 'Informe o bairro', action: 'keyup, blur', rule: 'required' },
+							  { input: '#local input', message: 'Informe o local', action: 'keyup, blur', rule: 'required' },
+							  
+								
+                     /*  { input: '#userInput', message: 'Your username must be between 3 and 12 characters!', action: 'keyup, blur', rule: 'length=3,12' },
+                       { input: '#realNameInput', message: 'Real Name is required!', action: 'keyup, blur', rule: 'required' },
+                       { input: '#realNameInput', message: 'Your real name must contain only letters!', action: 'keyup', rule: 'notNumber' },
+                       { input: '#realNameInput', message: 'Your real name must be between 3 and 12 characters!', action: 'keyup', rule: 'length=3,12' },
+                       {
+                           input: '#birthInput', message: 'Your birth date must be between 1/1/1900 and 1/1/2014.', action: 'valuechanged', rule: function (input, commit) {
+                               var date = $('#birthInput').jqxDateTimeInput('value');
+                               var result = date.getFullYear() >= 1900 && date.getFullYear() <= 2014;
+                               // call commit with false, when you are doing server validation and you want to display a validation error on this field. 
+                               return result;
+                           }
+                       },
+                       { input: '#passwordInput', message: 'Password is required!', action: 'keyup, blur', rule: 'required' },
+                       { input: '#passwordInput', message: 'Your password must be between 4 and 12 characters!', action: 'keyup, blur', rule: 'length=4,12' },
+                       { input: '#passwordConfirmInput', message: 'Password is required!', action: 'keyup, blur', rule: 'required' },
+                       {
+                           input: '#passwordConfirmInput', message: 'Passwords doesn\'t match!', action: 'keyup, focus', rule: function (input, commit) {
+                               // call commit with false, when you are doing server validation and you want to display a validation error on this field. 
+                               if (input.val() === $('#passwordInput').val()) {
+                                   return true;
+                               }
+                               return false;
+                           }
+                       },
+                       { input: '#emailInput', message: 'E-mail is required!', action: 'keyup, blur', rule: 'required' },
+                       { input: '#emailInput', message: 'Invalid e-mail!', action: 'keyup', rule: 'email' },
+                       { input: '#ssnInput', message: 'Invalid SSN!', action: 'valuechanged, blur', rule: 'ssn' },
+                       { input: '#phoneInput', message: 'Invalid phone number!', action: 'valuechanged, blur', rule: 'phone' },
+                       { input: '#zipInput', message: 'Invalid zip code!', action: 'valuechanged, blur', rule: 'zipCode' },
+                       { input: '#acceptInput', message: 'You have to accept the terms', action: 'change', rule: 'required', position: 'right:0,0' }*/]
+         });
+				
+	});
+	
+		
+	function debug(){
+		
+		$("#DateIni").html($('#inicio').jqxDateTimeInput('value'));
+		$("#DateIniHora").html($('#inicio_time').jqxDateTimeInput('value'));
+		$("#DateConf").html($('#hora_limite_confirmacao').jqxDateTimeInput('value'));
+		$("#DateConfHora").html($('#hora_limite_confirmacao_time').jqxDateTimeInput('value'));
+	}
+
+</script>
+<style>
+body {
+	font-family: Arial;
+}
+.text-input
+	  {
+			height: 21px;
+			width: 200px;
+	  }
+	  .register-table
+	  {
+			margin-top: 10px;
+			margin-bottom: 10px;
+	  }
+	  .register-table td, 
+	  .register-table tr
+	  {
+			margin: 0px;
+			padding: 2px;
+			border-spacing: 0px;
+			border-collapse: collapse;
+			font-family: Verdana;
+			font-size: 12px;
+	  }
+	  h3 
+	  {
+			display: inline-block;
+			margin: 0px;
+			padding:3px;
+	  }
+	label{
+		font-weight:bold;
+	}
+</style>
+
+</head>
+<body>
+	<a href='index.php'> Home </a>
+	<h3>Cadastro de evento!</h3>
+	
+	<form action="evento.php" method="post" id="form">
+		<input type="hidden" name="frmPassou" value="OK">
+		<table class='register-table' >
+			
+			<tr>
+				<td><label for='bairro'>Bairro:</label></td>
+				
+				<td><div id='bairro'></div></td>
+				
+			</tr>
+			
+			<tr>
+				<td><label for='local'>Local:</label></td>
+				
+				<td><div id='local'></div></td>
+				
+			</tr>
+			<tr>
+				<td><label for='faltam'>Faltam:</label></td>
+				<td>
+					<select id="faltam" name="faltam">
+						
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+					</select>
+				</td>
+
+			</tr>
+
+			<tr>
+				<td><label for='observacoes'>Observação:<label></td>
+				<td><textarea rows="4" cols="40" name="observacoes" id="observacoes"></textarea></td>
+
+			</tr>
+
+			<tr>
+				<td><label>Início:</label></td>
+				<td><!-- <input type="text" id='inicio' name="inicio"> -->
+				
+					<div id="inicio"></div>
+					<div id="inicio_time"></div>
+				</td>
+
+			</tr>
+
+
+			<tr>
+				<td><label>Confirmar até:</label></td>
+				<td><!--<input type="text" name="hora_limite_confirmacao">-->
+				<div id="hora_limite_confirmacao"></div>
+				<div id="hora_limite_confirmacao_time"></div>
+				</td>
+
+			</tr>
+
+
+			<tr>
+				<td><label>Pagar?</label></td>
+				<td><input type="checkbox" name="pagar"></td>
+
+			</tr>
+
+			<tr>
+
+				<td><input id="sendButton"  type="button" value="Send" ></td>
+
+			</tr>
+		</table>
+
+	</form>
+
+</body>
+</html>

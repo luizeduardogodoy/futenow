@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<link rel="stylesheet" href="js/jqwidgets/styles/jqx.base.css" type="text/css" />
+<link rel="stylesheet" href="js/jqwidgets/styles/jqx.summer.css" type="text/css" />
+<script type="text/javascript" src="js/jquery/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxcore.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxbuttons.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxscrollbar.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxmenu.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxlistbox.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxdropdownlist.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxwindow.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxbuttons.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxcheckbox.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxscrollbar.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxpanel.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.js"></script>
+<!--<script type="text/javascript" src="js/jqwidgets/jqxgrid.storage.js"></script>-->
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.selection.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxcalendar.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxdatetimeinput.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.sort.js"></script>		
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.filter.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxdata.js"></script>	
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.pager.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.columnsresize.js"></script>		
+<script type="text/javascript" src="js/jqwidgets/jqxgrid.columnsreorder.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxinput.js"></script>
+<script type="text/javascript" src="js/jqwidgets/jqxvalidator.js"></script> 
+<script type="text/javascript" src="js/jqwidgets/jqxcombobox.js"></script>   
+
+<script type="text/javascript" src="js/jqwidgets/jqxdatatable.js"></script>
+<script type="text/javascript" src="js/jqwidgets/globalization/globalize.js"></script>
+<script type="text/javascript" src="js/jqwidgets/globalization/cultures/globalize.culture.pt-BR.js"></script>
+<script type="text/javascript" src="js/localization.js"></script>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>FuteNow</title>
+
+<script>
+	$(document).ready(function () {
+		
+		var theme = 'summer';
+		
+		//$('a, button, input[type=submit]').jqxButton();
+				
+		var inicioDateMax = new Date();
+		inicioDateMax.setFullYear(inicioDateMax.getFullYear() - 10);
+		
+		$('#nascimento').jqxDateTimeInput({
+			max : inicioDateMax, 
+			width: '200px', 
+			height: '25px', 
+			culture: 'pt-BR',
+			theme: theme 
+		});
+						
+		// prepare the data
+		var sourceEstado =
+		{
+			 datatype: "json",
+			 datafields: [
+				  { name: 'id' },
+				  { name: 'nome' }
+				  
+			 ],
+			 url: "inc/ajax.php?req=estado"
+			 
+		};
+		var dataAdapterEstado = new $.jqx.dataAdapter(sourceEstado);
+		
+		$('#estado').jqxComboBox({
+			promptText: "Selecione o estado...", 
+			theme: theme, 
+			source: dataAdapterEstado, 
+			displayMember: "nome", 
+			valueMember: "id", 
+			width: 200, 
+			height: 25
+		});
+		
+		var sourceCidade =
+		{
+			 datatype: "json",
+			 datafields: [
+				  
+				  { name: 'nome' },
+				  { name: 'id' }
+			 ],
+			 url: "inc/ajax.php?req=cidade"
+			 
+		};
+		
+		$("#estado").bind('select', function(event){
+			if (event.args){				
+				$("#cidade").jqxComboBox({ disabled: false, selectedIndex: 0});		
+				
+				var value = event.args.item.value;
+									
+				sourceCidade.url = "inc/ajax.php?req=cidade&estado_id=" + value; 
+				
+				dataAdapterCidade = new $.jqx.dataAdapter(sourceCidade);
+				$("#cidade").jqxComboBox({source: dataAdapterCidade});
+			}
+		});
+		
+		$('#cidade').jqxComboBox({
+			disabled: true,
+			promptText: "Selecione o cidade...",
+			theme: theme, 
+			selectedIndex: 0, 
+			displayMember: "nome", 
+			valueMember: "id", 
+			width: 200, 
+			height: 25
+		});
+		
+		
+		$("#sendButton").click(function () {
+			var validationResult = function (isValid) {
+				if (isValid) {
+					$("#form").submit();
+				}
+			}
+			$('#form').jqxValidator('validate', validationResult);
+		});
+		
+		$('#form').jqxValidator({
+			//hintType: 'label',
+			rules: [
+				{ input: '#nome', message: 'Informe o seu nome', action: 'keyup, blur', rule: 'required' },
+				{ input: '#cidade input', message: 'Informe a sua cidade', action: 'keyup, blur', rule: 'required' },
+				{ input: '#email', message: 'Email invalido', action: 'blur', rule: 'email'  },
+				{ input: '#email', message: 'Informe seu email', action: 'blur', rule: 'required'  },
+			]
+		});
+		
+		
+	});
+</script>
+<style>
+body {
+	font-family: Arial;
+}
+</style>
+</head>
+<body>
+
+Bem vindo ao Futenow!
+
+<br />
+
+<h3>Cadastro de usuário</h3>
+<form id="form" action="cadastrousuario.php" method="post">
+
+	<table>
+		
+		<tr>
+			<td>Nome:</td>
+			<td><input type="text" name='nome' id="nome"/></td>
+		</tr>
+		
+		<tr>
+			<td>Estado:</td>
+			<td><div id="estado"></div></td>
+		</tr>
+		
+		<tr>
+			<td>Cidade:</td>
+			<td><div id="cidade"></div></td>
+		</tr>
+		
+		<tr>
+			<td>Data de nascimento:</td>
+			<td><div id="nascimento"></div></td>
+		</tr>
+		<tr>
+			<td>Email:</td>
+			<td><input type="text" name='email' id="email"/></td>
+		</tr>
+		<tr>
+			<td>Senha:</td>
+			<td><input type="password" name="senha"/></td>
+		</tr>
+		
+		<tr>
+			
+			<td><input type="button" id="sendButton" value="Send"></td>
+		</tr>	
+	</table>
+</form>
+</body>
+</html>
